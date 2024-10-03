@@ -11,7 +11,7 @@ export default function App() {
   return (
     <ScrollView style={styles.container}>
       {cropData.map((crop) => (
-        <View key={crop} style={styles.card}>
+        <View key={crop.id} style={styles.card}>
           <Image source={{ uri: crop.image }} style={styles.cropImage} />
           <View style={styles.cardContent}>
             <Text style={styles.cropName}>{crop.name}</Text>
