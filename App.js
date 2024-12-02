@@ -5,23 +5,53 @@ import {
   Text,
   Image,
   Button,
+  TouchableOpacity,
+  Alert,
 } from "react-native";
-import cropData from "./Data";
+import { useEffect, useState } from "react";
+
 export default function App() {
+  const [data, setData] = useState([]);
+  const cart = async () => {
+    try {
+      const response = await fetch("https://dummyjson.com/carts");
+      const data = await response.json();
+      setData(data.carts);
+    } catch (error) {
+      console.warn(error);
+    }
+  };
+
+  useEffect(() => {
+    cart();
+  }, []);
+
+  const handleAddToCart = (productTitle) => {
+    Alert.alert("Added to Cart", `${productTitle} has been added to your cart.`);
+  };
+
   return (
     <ScrollView style={styles.container}>
-      {cropData.map((crop) => (
-        <View key={crop.id} style={styles.card}>
-          <Image source={{ uri: crop.image }} style={styles.cropImage} />
-          <View style={styles.cardContent}>
-            <Text style={styles.cropName}>{crop.name}</Text>
-            <Text>Price: {crop.price}</Text>
-            <Text>Farmer: {crop.farmerName}</Text>
-            <Text>Location: {crop.location}</Text>
-            <Text>Rating: {crop.rating} ★</Text>
-            <Text>Quantity: {crop.quantity}</Text>
-          </View>
-          <Button title="Buy" onPress={() => alert("Hola!")} />
+      <Text style={styles.headerText}>🛒 Your Shopping Cart</Text>
+      {data.slice(0, 1).map((item, index) => (
+        <View style={styles.card} key={index}>
+          <Text style={styles.cardTitle}>Products</Text>
+          {item.products.map((product, index) => (
+            <View style={styles.productView} key={index}>
+              <Image
+                source={{ uri: product.thumbnail }}
+                style={styles.cropImage}
+              />
+              <Text style={styles.cropName}>{product.title}</Text>
+              <Text style={styles.priceText}>${product.price}</Text>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() => handleAddToCart(product.title)}
+              >
+                <Text style={styles.buttonText}>Add to Cart</Text>
+              </TouchableOpacity>
+            </View>
+          ))}
         </View>
       ))}
     </ScrollView>
@@ -33,28 +63,73 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 10,
     marginTop: 20,
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#f9fafb",
+  },
+  headerText: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#1f2937",
+    marginBottom: 15,
+    textAlign: "center",
   },
   card: {
-    backgroundColor: "#fff",
+    backgroundColor: "#ffffff",
     borderRadius: 10,
-    padding: 15,
+    padding: 20,
     marginBottom: 15,
     shadowColor: "#000",
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 3,
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+  },
+  cardTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#4b5563",
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  productView: {
+    alignItems: "center",
+    marginBottom: 15,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+    borderRadius: 10,
+    backgroundColor: "#fefefe",
   },
   cropImage: {
-    width: "100%",
+    width: 150,
     height: 150,
-    borderRadius: 10,
-  },
-  cardContent: {
-    marginTop: 10,
+    borderRadius: 8,
+    marginVertical: 10,
   },
   cropName: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "bold",
+    color: "#1f2937",
+    textAlign: "center",
+    marginBottom: 5,
+  },
+  priceText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#10b981",
+    textAlign: "center",
+    marginBottom: 10,
+  },
+  button: {
+    backgroundColor: "#2563eb",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+  },
+  buttonText: {
+    color: "#ffffff",
+    fontSize: 14,
+    fontWeight: "bold",
+    textAlign: "center",
   },
 });
